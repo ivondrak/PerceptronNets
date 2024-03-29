@@ -16,25 +16,27 @@ class Perceptron:
         for epoch in range(self.epochs):
             for vector in self.training_data:
                 input_vector = np.array(vector[0])
-                desired_output = np.array(vector[1])
-                actual_input = np.insert(input_vector, 0, -1.0)
-                product = np.dot(self.weights, actual_input)
+                desired_output = np.array(vector[1]).reshape(self.num_results, 1) #column vector of desired output
+                actual_input = np.insert(input_vector, 0, -1.0).reshape(self.num_features + 1, 1) #column vector of input
+                # product is column vector given by multiplication of weight matrix and column vector of input
+                #product = np.dot(self.weights, actual_input) 
+                product = self.weights @ actual_input
                 actual_output = self.signum_function(product)
                 error = desired_output - actual_output
-                self.weights += np.dot(self.learning_rate * error.reshape([self.num_results, 1]), actual_input.reshape([1, self.num_features + 1]))
+                self.weights += np.dot(self.learning_rate * error, actual_input.reshape([1, self.num_features + 1]))
 
     def run(self, net_input):
-        actual_input = np.insert(net_input, 0, -1.0)
-        product = np.dot(self.weights, actual_input)
-        return self.signum_function(product).tolist()
+        actual_input = np.insert(net_input, 0, -1.0).reshape(self.num_features + 1, 1)
+        product = self.weights @ actual_input
+        return self.signum_function(product).flatten().tolist()
     
     def calculate_mse(self):
         mse = 0
         for vector in self.training_data:
             input_vector = np.array(vector[0])
-            desired_output = np.array(vector[1])
-            actual_input = np.insert(input_vector, 0, -1.0)
-            product = np.dot(self.weights, actual_input)
+            desired_output = np.array(vector[1]).reshape(self.num_results, 1)
+            actual_input = np.insert(input_vector, 0, -1.0).reshape(self.num_features + 1, 1)
+            product = self.weights @ actual_input
             actual_output = self.signum_function(product)
             error = desired_output - actual_output
             mse += np.sum(error ** 2)
@@ -45,9 +47,9 @@ class Perceptron:
         max_error = 0
         for vector in self.training_data:
             input_vector = np.array(vector[0])
-            desired_output = np.array(vector[1])
-            actual_input = np.insert(input_vector, 0, -1.0)
-            product = np.dot(self.weights, actual_input)
+            desired_output = np.array(vector[1]).reshape(self.num_results, 1)
+            actual_input = np.insert(input_vector, 0, -1.0).reshape(self.num_features + 1, 1)
+            product = self.weights @ actual_input
             actual_output = self.signum_function(product)
             error = desired_output - actual_output
             max_error = max(max_error, np.max(np.abs(error)))
